@@ -113,17 +113,17 @@ const TaskForm = ({ isOpen, onClose, onSave, task }: TaskFormProps) => {
       };
 
       if (task) {
-        // Update existing task
+        // Update existing task - using type assertion
         const { error } = await supabase
           .from("tasks")
           .update(taskData)
-          .eq("id", task.id);
+          .eq("id", task.id) as any;
 
         if (error) throw error;
         toast({ title: "Task updated successfully" });
       } else {
-        // Create new task
-        const { error } = await supabase.from("tasks").insert([taskData]);
+        // Create new task - using type assertion
+        const { error } = await supabase.from("tasks").insert([taskData]) as any;
 
         if (error) throw error;
         toast({ title: "Task created successfully" });

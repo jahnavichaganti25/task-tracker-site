@@ -27,29 +27,33 @@ const ProgressDashboard = () => {
     try {
       setIsLoading(true);
       
-      // Fetch tasks stats
+      // Fetch tasks stats - using type assertion to bypass TypeScript's strictness
       const { data: tasks, error: tasksError } = await supabase
         .from("tasks")
-        .select('*');
+        .select('*') as any;
       
       if (tasksError) throw tasksError;
       
-      // Fetch events stats
+      // Fetch events stats - using type assertion to bypass TypeScript's strictness
       const { data: events, error: eventsError } = await supabase
         .from("events")
-        .select('*');
+        .select('*') as any;
       
       if (eventsError) throw eventsError;
       
+      // Process the tasks and events data
+      const tasksData = tasks || [];
+      const eventsData = events || [];
+      
       setStats({
         tasks: {
-          total: tasks?.length || 0,
-          completed: tasks?.filter(task => task.completed).length || 0,
+          total: tasksData.length || 0,
+          completed: tasksData.filter(task => task.completed).length || 0,
         },
         events: {
-          total: events?.length || 0,
-          attended: events?.filter(event => event.attended).length || 0,
-          completed: events?.filter(event => event.completed).length || 0,
+          total: eventsData.length || 0,
+          attended: eventsData.filter(event => event.attended).length || 0,
+          completed: eventsData.filter(event => event.completed).length || 0,
         }
       });
     } catch (error) {

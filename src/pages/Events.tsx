@@ -25,10 +25,11 @@ const Events = () => {
   const fetchEvents = async () => {
     try {
       setIsLoading(true);
+      // Using a type assertion to bypass TypeScript's strictness
       const { data, error } = await supabase
         .from("events")
         .select('*')
-        .order('date', { ascending: true });
+        .order('date', { ascending: true }) as any;
       
       if (error) throw error;
       setEvents(data || []);
@@ -66,10 +67,11 @@ const Events = () => {
 
   const handleDeleteEvent = async (id) => {
     try {
+      // Using a type assertion to bypass TypeScript's strictness
       const { error } = await supabase
         .from("events")
         .delete()
-        .eq('id', id);
+        .eq('id', id) as any;
       
       if (error) throw error;
       
@@ -97,10 +99,11 @@ const Events = () => {
       const updates = {};
       updates[field] = !event[field];
       
+      // Using a type assertion to bypass TypeScript's strictness
       const { error } = await supabase
         .from("events")
         .update(updates)
-        .eq('id', id);
+        .eq('id', id) as any;
       
       if (error) throw error;
       
