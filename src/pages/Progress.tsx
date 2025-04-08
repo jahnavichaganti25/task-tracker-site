@@ -3,17 +3,24 @@ import React, { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import Navbar from "@/components/Navbar";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calendar, Clock, CheckCircle, XCircle } from "lucide-react";
+import Navbar from "@/components/Navbar";
+import { Loader2 } from "lucide-react";
 
-const ProgressDashboard = () => {
+const ProgressPage = () => {
   const [isLoading, setIsLoading] = useState(true);
-  const [stats, setStats] = useState({
-    tasks: { total: 0, completed: 0 },
-    events: { total: 0, attended: 0, completed: 0 },
+  const [taskStats, setTaskStats] = useState({
+    total: 0,
+    completed: 0,
+    completionRate: 0,
+  });
+  const [eventStats, setEventStats] = useState({
+    total: 0,
+    attended: 0,
+    completed: 0,
+    attendanceRate: 0,
+    completionRate: 0,
   });
   const { user } = useAuth();
   const { toast } = useToast();
@@ -26,35 +33,41 @@ const ProgressDashboard = () => {
   const fetchStats = async () => {
     try {
       setIsLoading(true);
-      
-      // Fetch tasks stats - using type assertion to bypass TypeScript's strictness
+      // Fetch tasks
       const { data: tasks, error: tasksError } = await supabase
         .from("tasks")
-        .select('*') as any;
+        .select('*');
       
       if (tasksError) throw tasksError;
       
-      // Fetch events stats - using type assertion to bypass TypeScript's strictness
+      // Fetch events
       const { data: events, error: eventsError } = await supabase
         .from("events")
-        .select('*') as any;
+        .select('*');
       
       if (eventsError) throw eventsError;
       
-      // Process the tasks and events data
-      const tasksData = tasks || [];
-      const eventsData = events || [];
+      // Calculate task stats
+      const totalTasks = tasks?.length || 0;
+      const completedTasks = tasks?.filter(task => task.completed)?.length || 0;
       
-      setStats({
-        tasks: {
-          total: tasksData.length || 0,
-          completed: tasksData.filter(task => task.completed).length || 0,
-        },
-        events: {
-          total: eventsData.length || 0,
-          attended: eventsData.filter(event => event.attended).length || 0,
-          completed: eventsData.filter(event => event.completed).length || 0,
-        }
+      setTaskStats({
+        total: totalTasks,
+        completed: completedTasks,
+        completionRate: totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0,
+      });
+      
+      // Calculate event stats
+      const totalEvents = events?.length || 0;
+      const attendedEvents = events?.filter(event => event.attended)?.length || 0;
+      const completedEvents = events?.filter(event => event.completed)?.length || 0;
+      
+      setEventStats({
+        total: totalEvents,
+        attended: attendedEvents,
+        completed: completedEvents,
+        attendanceRate: totalEvents > 0 ? (attendedEvents / totalEvents) * 100 : 0,
+        completionRate: totalEvents > 0 ? (completedEvents / totalEvents) * 100 : 0,
       });
     } catch (error) {
       toast({
@@ -67,170 +80,73 @@ const ProgressDashboard = () => {
     }
   };
 
-  const taskCompletionRate = stats.tasks.total > 0 
-    ? Math.round((stats.tasks.completed / stats.tasks.total) * 100) 
-    : 0;
-  
-  const eventAttendanceRate = stats.events.total > 0 
-    ? Math.round((stats.events.attended / stats.events.total) * 100) 
-    : 0;
-  
-  const eventCompletionRate = stats.events.total > 0 
-    ? Math.round((stats.events.completed / stats.events.total) * 100) 
-    : 0;
-
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
       <main className="flex-1 container mx-auto py-8 px-4 md:px-6">
-        <h1 className="text-2xl font-bold mb-6">Progress Dashboard</h1>
+        <h1 className="text-2xl font-bold mb-6">Progress Tracking</h1>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Calendar className="h-5 w-5" /> Tasks
-              </CardTitle>
-              <CardDescription>
-                Task completion progress
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span>Completed</span>
-                  <span className="font-medium">{stats.tasks.completed} / {stats.tasks.total}</span>
-                </div>
-                <Progress value={taskCompletionRate} />
-                <div className="text-center text-sm text-muted-foreground">
-                  {taskCompletionRate}% complete
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg flex items-center gap-2">
-                <CheckCircle className="h-5 w-5" /> Event Attendance
-              </CardTitle>
-              <CardDescription>
-                Events you've attended
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span>Attended</span>
-                  <span className="font-medium">{stats.events.attended} / {stats.events.total}</span>
-                </div>
-                <Progress value={eventAttendanceRate} />
-                <div className="text-center text-sm text-muted-foreground">
-                  {eventAttendanceRate}% attended
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg flex items-center gap-2">
-                <XCircle className="h-5 w-5" /> Event Completion
-              </CardTitle>
-              <CardDescription>
-                Events you've completed
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span>Completed</span>
-                  <span className="font-medium">{stats.events.completed} / {stats.events.total}</span>
-                </div>
-                <Progress value={eventCompletionRate} />
-                <div className="text-center text-sm text-muted-foreground">
-                  {eventCompletionRate}% completed
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-        
-        <Tabs defaultValue="tasks" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="tasks">Tasks Summary</TabsTrigger>
-            <TabsTrigger value="events">Events Summary</TabsTrigger>
-          </TabsList>
-          <TabsContent value="tasks" className="mt-4">
+        {isLoading ? (
+          <div className="flex justify-center items-center h-40">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+        ) : (
+          <div className="grid gap-6 md:grid-cols-2">
             <Card>
               <CardHeader>
-                <CardTitle>Tasks Breakdown</CardTitle>
-                <CardDescription>
-                  Overview of your task completion status
-                </CardDescription>
+                <CardTitle>Task Completion</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="flex flex-col items-center justify-center p-4 bg-muted rounded-lg">
-                      <span className="text-2xl font-bold">{stats.tasks.completed}</span>
-                      <span className="text-sm text-muted-foreground">Completed</span>
+                  <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-sm font-medium">Tasks Completed</span>
+                      <span className="text-sm font-medium">{Math.round(taskStats.completionRate)}%</span>
                     </div>
-                    <div className="flex flex-col items-center justify-center p-4 bg-muted rounded-lg">
-                      <span className="text-2xl font-bold">{stats.tasks.total - stats.tasks.completed}</span>
-                      <span className="text-sm text-muted-foreground">Pending</span>
-                    </div>
-                  </div>
-                  <div className="text-center text-sm text-muted-foreground">
-                    {stats.tasks.total === 0 ? (
-                      <p>No tasks added yet. Start by creating your first task!</p>
-                    ) : (
-                      <p>You've completed {taskCompletionRate}% of your tasks.</p>
-                    )}
+                    <Progress value={taskStats.completionRate} className="h-2" />
+                    <p className="mt-2 text-sm text-muted-foreground">
+                      {taskStats.completed} of {taskStats.total} tasks completed
+                    </p>
                   </div>
                 </div>
               </CardContent>
             </Card>
-          </TabsContent>
-          <TabsContent value="events" className="mt-4">
+            
             <Card>
               <CardHeader>
-                <CardTitle>Events Breakdown</CardTitle>
-                <CardDescription>
-                  Overview of your event participation status
-                </CardDescription>
+                <CardTitle>Event Progress</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="flex flex-col items-center justify-center p-4 bg-muted rounded-lg">
-                      <span className="text-2xl font-bold">{stats.events.attended}</span>
-                      <span className="text-sm text-muted-foreground">Attended</span>
+                  <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-sm font-medium">Events Attended</span>
+                      <span className="text-sm font-medium">{Math.round(eventStats.attendanceRate)}%</span>
                     </div>
-                    <div className="flex flex-col items-center justify-center p-4 bg-muted rounded-lg">
-                      <span className="text-2xl font-bold">{stats.events.completed}</span>
-                      <span className="text-sm text-muted-foreground">Completed</span>
-                    </div>
-                    <div className="flex flex-col items-center justify-center p-4 bg-muted rounded-lg">
-                      <span className="text-2xl font-bold">{stats.events.total}</span>
-                      <span className="text-sm text-muted-foreground">Total</span>
-                    </div>
+                    <Progress value={eventStats.attendanceRate} className="h-2" />
+                    <p className="mt-2 text-sm text-muted-foreground">
+                      {eventStats.attended} of {eventStats.total} events attended
+                    </p>
                   </div>
-                  <div className="text-center text-sm text-muted-foreground">
-                    {stats.events.total === 0 ? (
-                      <p>No events added yet. Start by creating your first event!</p>
-                    ) : (
-                      <p>You've attended {eventAttendanceRate}% of your events and completed {eventCompletionRate}%.</p>
-                    )}
+                  
+                  <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-sm font-medium">Events Completed</span>
+                      <span className="text-sm font-medium">{Math.round(eventStats.completionRate)}%</span>
+                    </div>
+                    <Progress value={eventStats.completionRate} className="h-2" />
+                    <p className="mt-2 text-sm text-muted-foreground">
+                      {eventStats.completed} of {eventStats.total} events completed
+                    </p>
                   </div>
                 </div>
               </CardContent>
             </Card>
-          </TabsContent>
-        </Tabs>
+          </div>
+        )}
       </main>
     </div>
   );
 };
 
-export default ProgressDashboard;
+export default ProgressPage;

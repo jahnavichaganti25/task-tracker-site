@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -11,8 +11,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { CalendarIcon } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
   Dialog,
   DialogContent,
@@ -40,90 +40,66 @@ const formSchema = z.object({
   title: z.string().min(1, { message: "Title is required" }),
   description: z.string().optional(),
   start_date: z.date().optional(),
+  start_time: z.string().optional(),
   end_date: z.date().optional(),
+  end_time: z.string().optional(),
 });
 
 const TaskForm = ({ isOpen, onClose, onSave, task }: TaskFormProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
-  const [startTime, setStartTime] = useState("12:00");
-  const [endTime, setEndTime] = useState("12:00");
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      title: task?.title || "",
-      description: task?.description || "",
-      start_date: task?.start_date ? new Date(task.start_date) : undefined,
-      end_date: task?.end_date ? new Date(task.end_date) : undefined,
+      title: "",
+      description: "",
+      start_date: undefined,
+      start_time: "09:00",
+      end_date: undefined,
+      end_time: "17:00",
     },
   });
 
   useEffect(() => {
     if (task) {
-      if (task.start_date) {
-        const startDate = new Date(task.start_date);
-        form.setValue("start_date", startDate);
-        setStartTime(
-          `${String(startDate.getHours()).padStart(2, "0")}:${String(
-            startDate.getMinutes()
-          ).padStart(2, "0")}`
-        );
-      }
-      
-      if (task.end_date) {
-        const endDate = new Date(task.end_date);
-        form.setValue("end_date", endDate);
-        setEndTime(
-          `${String(endDate.getHours()).padStart(2, "0")}:${String(
-            endDate.getMinutes()
-          ).padStart(2, "0")}`
-        );
-      }
+      form.reset({
+        title: task.title || "",
+        description: task.description || "",
+        start_date: task.start_date ? new Date(task.start_date) : undefined,
+        start_time: task.start_time || "09:00",
+        end_date: task.end_date ? new Date(task.end_date) : undefined,
+        end_time: task.end_time || "17:00",
+      });
     }
   }, [task, form]);
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      const startDate = values.start_date;
-      const endDate = values.end_date;
-      
-      // Combine date with time
-      let finalStartDate = undefined;
-      let finalEndDate = undefined;
-      
-      if (startDate) {
-        const [hours, minutes] = startTime.split(":").map(Number);
-        finalStartDate = new Date(startDate);
-        finalStartDate.setHours(hours, minutes);
-      }
-      
-      if (endDate) {
-        const [hours, minutes] = endTime.split(":").map(Number);
-        finalEndDate = new Date(endDate);
-        finalEndDate.setHours(hours, minutes);
-      }
-
+      // Format dates as ISO strings for Supabase
       const taskData = {
         title: values.title,
         description: values.description || "",
-        start_date: finalStartDate,
-        end_date: finalEndDate,
+        start_date: values.start_date ? format(values.start_date, 'yyyy-MM-dd') : null,
+        end_date: values.end_date ? format(values.end_date, 'yyyy-MM-dd') : null,
         user_id: user.id,
       };
 
       if (task) {
-        // Update existing task - using type assertion
+        // Update existing task
         const { error } = await supabase
           .from("tasks")
           .update(taskData)
-          .eq("id", task.id) as any;
+          .eq("id", task.id);
 
         if (error) throw error;
         toast({ title: "Task updated successfully" });
       } else {
-        // Create new task - using type assertion
-        const { error } = await supabase.from("tasks").insert([taskData]) as any;
+        // Create new task
+        const { error } = await supabase.from("tasks").insert([{
+          ...taskData,
+          completed: false
+        }]);
 
         if (error) throw error;
         toast({ title: "Task created successfully" });
@@ -213,18 +189,25 @@ const TaskForm = ({ isOpen, onClose, onSave, task }: TaskFormProps) => {
                         />
                       </PopoverContent>
                     </Popover>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="start_time"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Start Time</FormLabel>
                     <FormControl>
-                      <Input
-                        type="time"
-                        value={startTime}
-                        onChange={(e) => setStartTime(e.target.value)}
-                        className="mt-2"
-                      />
+                      <Input type="time" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
                 name="end_date"
@@ -260,13 +243,18 @@ const TaskForm = ({ isOpen, onClose, onSave, task }: TaskFormProps) => {
                         />
                       </PopoverContent>
                     </Popover>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="end_time"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>End Time</FormLabel>
                     <FormControl>
-                      <Input
-                        type="time"
-                        value={endTime}
-                        onChange={(e) => setEndTime(e.target.value)}
-                        className="mt-2"
-                      />
+                      <Input type="time" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

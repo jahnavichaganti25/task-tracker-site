@@ -73,27 +73,27 @@ const EventForm = ({ isOpen, onClose, onSave, event }: EventFormProps) => {
       const eventData = {
         title: values.title,
         description: values.description || "",
-        date: values.date,
+        date: values.date ? format(values.date, 'yyyy-MM-dd') : null,  // Convert Date to string format
         time: values.time,
         user_id: user.id,
       };
 
       if (event) {
-        // Update existing event - using type assertion
+        // Update existing event
         const { error } = await supabase
           .from("events")
           .update(eventData)
-          .eq("id", event.id) as any;
+          .eq("id", event.id);
 
         if (error) throw error;
         toast({ title: "Event updated successfully" });
       } else {
-        // Create new event with default status - using type assertion
+        // Create new event with default status
         const { error } = await supabase.from("events").insert([{
           ...eventData,
           attended: false,
           completed: false
-        }]) as any;
+        }]);
 
         if (error) throw error;
         toast({ title: "Event created successfully" });
