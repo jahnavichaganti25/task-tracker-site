@@ -8,6 +8,9 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
+import Tasks from "./pages/Tasks";
+import Events from "./pages/Events";
+import Progress from "./pages/Progress";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -25,7 +28,9 @@ const App = () => (
             
             {/* Protected routes */}
             <Route element={<ProtectedRoute />}>
-              {/* Add protected routes here */}
+              <Route path="/tasks" element={<Tasks />} />
+              <Route path="/events" element={<Events />} />
+              <Route path="/progress" element={<Progress />} />
             </Route>
             
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
