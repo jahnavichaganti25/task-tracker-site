@@ -29,14 +29,14 @@ const ProgressDashboard = () => {
       
       // Fetch tasks stats
       const { data: tasks, error: tasksError } = await supabase
-        .from('tasks')
+        .from("tasks")
         .select('*');
       
       if (tasksError) throw tasksError;
       
       // Fetch events stats
       const { data: events, error: eventsError } = await supabase
-        .from('events')
+        .from("events")
         .select('*');
       
       if (eventsError) throw eventsError;

@@ -9,6 +9,45 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      events: {
+        Row: {
+          attended: boolean
+          completed: boolean
+          created_at: string
+          date: string | null
+          description: string | null
+          id: string
+          time: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          attended?: boolean
+          completed?: boolean
+          created_at?: string
+          date?: string | null
+          description?: string | null
+          id?: string
+          time?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          attended?: boolean
+          completed?: boolean
+          created_at?: string
+          date?: string | null
+          description?: string | null
+          id?: string
+          time?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -33,6 +72,42 @@ export type Database = {
           id?: string
           updated_at?: string
           username?: string | null
+        }
+        Relationships: []
+      }
+      tasks: {
+        Row: {
+          completed: boolean
+          created_at: string
+          description: string | null
+          end_date: string | null
+          id: string
+          start_date: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completed?: boolean
+          created_at?: string
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          start_date?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completed?: boolean
+          created_at?: string
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          start_date?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }

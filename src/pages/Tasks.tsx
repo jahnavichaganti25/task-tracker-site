@@ -28,7 +28,7 @@ const Tasks = () => {
     try {
       setIsLoading(true);
       const { data, error } = await supabase
-        .from('tasks')
+        .from("tasks")
         .select('*')
         .order('start_date', { ascending: true });
       
@@ -69,7 +69,7 @@ const Tasks = () => {
   const handleDeleteTask = async (id) => {
     try {
       const { error } = await supabase
-        .from('tasks')
+        .from("tasks")
         .delete()
         .eq('id', id);
       
@@ -93,7 +93,7 @@ const Tasks = () => {
   const handleToggleComplete = async (id, currentStatus) => {
     try {
       const { error } = await supabase
-        .from('tasks')
+        .from("tasks")
         .update({ completed: !currentStatus })
         .eq('id', id);
       

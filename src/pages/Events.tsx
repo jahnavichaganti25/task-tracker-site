@@ -26,7 +26,7 @@ const Events = () => {
     try {
       setIsLoading(true);
       const { data, error } = await supabase
-        .from('events')
+        .from("events")
         .select('*')
         .order('date', { ascending: true });
       
@@ -67,7 +67,7 @@ const Events = () => {
   const handleDeleteEvent = async (id) => {
     try {
       const { error } = await supabase
-        .from('events')
+        .from("events")
         .delete()
         .eq('id', id);
       
@@ -98,7 +98,7 @@ const Events = () => {
       updates[field] = !event[field];
       
       const { error } = await supabase
-        .from('events')
+        .from("events")
         .update(updates)
         .eq('id', id);
       
