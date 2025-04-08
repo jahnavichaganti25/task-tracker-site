@@ -1,34 +1,43 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Hero = () => {
+  const { user } = useAuth();
+
   return (
-    <div className="relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-br from-indigo-50 via-white to-purple-50 -z-10"></div>
-      <div className="max-w-7xl mx-auto px-6 md:px-10 py-16 md:py-24">
-        <div className="max-w-3xl">
-          <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6 animate-fade-in">
-            Welcome to Your New React Application
-          </h1>
-          <p className="text-xl text-muted-foreground mb-8 animate-fade-in">
-            A clean, modern starting point for your next amazing project. Build
-            something beautiful with React.
-          </p>
-          <div className="flex flex-wrap gap-4">
-            <Button size="lg" className="animate-fade-in">
-              Get Started
-            </Button>
-            <Button size="lg" variant="outline" className="animate-fade-in">
-              Learn More
-            </Button>
-          </div>
+    <div className="relative py-16 md:py-24 lg:py-32 px-6 md:px-10 flex flex-col items-center text-center">
+      <div className="absolute inset-0 bg-gradient-to-b from-background to-background/0 pointer-events-none" />
+      <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight max-w-3xl mb-6">
+        Manage Tasks Effectively with{" "}
+        <span className="bg-gradient-to-r from-indigo-500 to-purple-600 bg-clip-text text-transparent">
+          Task Tracker
+        </span>
+      </h1>
+      <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mb-8">
+        Stay organized, track your progress, and boost productivity with our simple yet powerful task management system.
+      </p>
+      {user ? (
+        <div className="flex flex-col sm:flex-row gap-4">
+          <Button asChild size="lg">
+            <Link to="/tasks">View Your Tasks</Link>
+          </Button>
+          <Button asChild variant="outline" size="lg">
+            <Link to="/tasks/new">Create New Task</Link>
+          </Button>
         </div>
-      </div>
-      <div className="absolute bottom-0 right-0 w-full h-64 md:h-96 -z-10 opacity-20">
-        <div className="absolute right-0 bottom-0 w-96 h-96 bg-purple-400 rounded-full filter blur-3xl"></div>
-        <div className="absolute right-64 bottom-10 w-64 h-64 bg-indigo-400 rounded-full filter blur-3xl"></div>
-      </div>
+      ) : (
+        <div className="flex flex-col sm:flex-row gap-4">
+          <Button asChild size="lg">
+            <Link to="/auth">Get Started</Link>
+          </Button>
+          <Button asChild variant="outline" size="lg">
+            <Link to="/auth">Sign In</Link>
+          </Button>
+        </div>
+      )}
     </div>
   );
 };
