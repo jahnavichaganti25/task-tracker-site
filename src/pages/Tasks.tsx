@@ -114,27 +114,49 @@ const Tasks = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-background to-secondary/20">
       <Navbar />
-      <main className="flex-1 container mx-auto py-8 px-4 md:px-6">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">Tasks</h1>
-          <Button onClick={handleAddTask}>
-            <Plus className="mr-2 h-4 w-4" /> Add Task
+      <main className="flex-1 container mx-auto py-10 px-4 md:px-6">
+        <div className="flex flex-col md:flex-row justify-between items-center mb-10 gap-4">
+          <div>
+            <h1 className="text-3xl font-bold gradient-text mb-2">Tasks</h1>
+            <p className="text-muted-foreground">Manage and track your tasks efficiently</p>
+          </div>
+          <Button 
+            onClick={handleAddTask} 
+            size="lg" 
+            className="shadow-md hover:shadow-lg transition-all"
+          >
+            <Plus className="mr-2 h-5 w-5" /> Add New Task
           </Button>
         </div>
 
         {isLoading ? (
-          <div className="flex justify-center items-center h-40">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <div className="flex justify-center items-center h-60">
+            <Loader2 className="h-10 w-10 animate-spin text-primary opacity-70" />
+          </div>
+        ) : tasks.length > 0 ? (
+          <div className="bg-card/70 backdrop-blur-sm rounded-xl shadow-sm p-6 border">
+            <TaskList 
+              tasks={tasks} 
+              onEdit={handleEditTask} 
+              onDelete={handleDeleteTask} 
+              onToggleComplete={handleToggleComplete} 
+            />
           </div>
         ) : (
-          <TaskList 
-            tasks={tasks} 
-            onEdit={handleEditTask} 
-            onDelete={handleDeleteTask} 
-            onToggleComplete={handleToggleComplete} 
-          />
+          <div className="text-center py-20 bg-card/70 backdrop-blur-sm rounded-xl shadow-sm border">
+            <div className="mx-auto w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
+              <Plus className="h-8 w-8 text-muted-foreground" />
+            </div>
+            <h3 className="text-xl font-medium mb-2">No tasks yet</h3>
+            <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+              Get started by adding your first task to keep track of your work.
+            </p>
+            <Button onClick={handleAddTask}>
+              <Plus className="mr-2 h-4 w-4" /> Create Task
+            </Button>
+          </div>
         )}
 
         {isFormOpen && (
