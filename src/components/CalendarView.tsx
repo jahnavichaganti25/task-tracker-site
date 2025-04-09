@@ -74,46 +74,48 @@ const CalendarView: React.FC<CalendarViewProps> = ({ events, onEventSelect }) =>
           </div>
         </CardHeader>
         <CardContent>
-          <Calendar
-            mode="single"
-            selected={selectedDate}
-            onSelect={setSelectedDate}
-            month={currentMonth}
-            onMonthChange={setCurrentMonth}
-            className="rounded-md border"
-            modifiersStyles={{
-              selected: {
-                backgroundColor: "hsl(var(--primary))",
-                color: "hsl(var(--primary-foreground))",
-              },
-              today: {
-                backgroundColor: "hsl(var(--accent))",
-                color: "hsl(var(--accent-foreground))",
-              },
-            }}
-            modifiers={{
-              hasEvents: (date) => hasEvents(date),
-            }}
-            classNames={{
-              day_hasEvents: "event-dot",
-            }}
-          />
-          <style>{`
-            .event-dot {
-              position: relative;
-            }
-            .event-dot::after {
-              content: "";
-              position: absolute;
-              width: 6px;
-              height: 6px;
-              border-radius: 50%;
-              background-color: hsl(var(--primary));
-              bottom: 4px;
-              left: 50%;
-              transform: translateX(-50%);
-            }
-          `}</style>
+          <div className="relative">
+            <Calendar
+              mode="single"
+              selected={selectedDate}
+              onSelect={setSelectedDate}
+              month={currentMonth}
+              onMonthChange={setCurrentMonth}
+              className="rounded-md border"
+              modifiersStyles={{
+                selected: {
+                  backgroundColor: "hsl(var(--primary))",
+                  color: "hsl(var(--primary-foreground))",
+                },
+                today: {
+                  backgroundColor: "hsl(var(--accent))",
+                  color: "hsl(var(--accent-foreground))",
+                },
+              }}
+              modifiers={{
+                hasEvents: (date) => hasEvents(date),
+              }}
+            />
+            <style>{`
+              .rdp-day_modifiers {
+                position: relative;
+              }
+              .rdp-day[aria-selected=true] {
+                position: relative;
+              }
+              .rdp-day[data-modifiers*="hasEvents"]::after {
+                content: "";
+                position: absolute;
+                width: 6px;
+                height: 6px;
+                border-radius: 50%;
+                background-color: hsl(var(--primary));
+                bottom: 4px;
+                left: 50%;
+                transform: translateX(-50%);
+              }
+            `}</style>
+          </div>
         </CardContent>
       </Card>
       
