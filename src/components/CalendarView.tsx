@@ -94,28 +94,27 @@ const CalendarView: React.FC<CalendarViewProps> = ({ events, onEventSelect }) =>
             modifiers={{
               hasEvents: (date) => hasEvents(date),
             }}
-            styles={{
-              day: (date) => {
-                if (hasEvents(date)) {
-                  return {
-                    position: "relative",
-                    "&::after": {
-                      content: '""',
-                      position: "absolute",
-                      width: "6px",
-                      height: "6px",
-                      borderRadius: "50%",
-                      backgroundColor: "hsl(var(--primary))",
-                      bottom: "4px",
-                      left: "50%",
-                      transform: "translateX(-50%)",
-                    },
-                  };
-                }
-                return {};
-              },
+            // Fix for TS2559: Remove the styles prop and use CSS classes instead
+            classNames={{
+              day_hasEvents: "event-dot",
             }}
           />
+          <style jsx>{`
+            :global(.event-dot) {
+              position: relative;
+            }
+            :global(.event-dot::after) {
+              content: "";
+              position: absolute;
+              width: 6px;
+              height: 6px;
+              border-radius: 50%;
+              background-color: hsl(var(--primary));
+              bottom: 4px;
+              left: 50%;
+              transform: translateX(-50%);
+            }
+          `}</style>
         </CardContent>
       </Card>
       

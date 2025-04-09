@@ -12,7 +12,14 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { BarChart as RechartsBarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip } from "recharts";
+import { BarChart as RechartsBarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip, TooltipProps } from "recharts";
+
+// Fix: Add proper type definition for the CustomTooltip component
+interface CustomTooltipProps extends TooltipProps<any, any> {
+  active?: boolean;
+  payload?: any[];
+  label?: any;
+}
 
 const ProgressPage = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -258,8 +265,8 @@ const ProgressPage = () => {
   );
 };
 
-// Custom tooltip for the bar chart
-const CustomTooltip = ({ active, payload, label }) => {
+// Fix: Update the CustomTooltip component with proper prop types
+const CustomTooltip: React.FC<CustomTooltipProps> = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
     return (
       <div className="bg-card border rounded-md shadow-md p-3">
