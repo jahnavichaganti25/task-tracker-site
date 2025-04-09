@@ -1,18 +1,22 @@
+
 import React, { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
-import { Plus, Loader2, Calendar } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Plus, Loader2, Calendar, List } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import EventList from "@/components/EventList";
 import EventForm from "@/components/EventForm";
+import CalendarView from "@/components/CalendarView";
 
 const Events = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [events, setEvents] = useState([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState(null);
+  const [activeTab, setActiveTab] = useState("list");
   const { user } = useAuth();
   const { toast } = useToast();
 
@@ -121,45 +125,75 @@ const Events = () => {
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-background to-secondary/20">
       <Navbar />
       <main className="flex-1 container mx-auto py-10 px-4 md:px-6">
-        <div className="flex flex-col md:flex-row justify-between items-center mb-10 gap-4">
+        <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
           <div>
             <h1 className="text-3xl font-bold gradient-text mb-2">Events</h1>
             <p className="text-muted-foreground">Schedule and manage your upcoming events</p>
           </div>
-          <Button 
-            onClick={handleAddEvent} 
-            size="lg"
-            className="shadow-md hover:shadow-lg transition-all"
+          <div className="flex items-center space-x-4">
+            <Tabs
+              value={activeTab}
+              onValueChange={setActiveTab}
+              className="hidden md:flex"
+            >
+              <TabsList>
+                <TabsTrigger value="list" className="flex items-center gap-2">
+                  <List className="h-4 w-4" /> List View
+                </TabsTrigger>
+                <TabsTrigger value="calendar" className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4" /> Calendar View
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
+            <Button 
+              onClick={handleAddEvent} 
+              size="lg"
+              className="shadow-md hover:shadow-lg transition-all"
+            >
+              <Plus className="mr-2 h-5 w-5" /> Add New Event
+            </Button>
+          </div>
+        </div>
+        
+        {/* Mobile tabs */}
+        <div className="mb-6 md:hidden">
+          <Tabs
+            value={activeTab}
+            onValueChange={setActiveTab}
+            className="w-full"
           >
-            <Plus className="mr-2 h-5 w-5" /> Add New Event
-          </Button>
+            <TabsList className="w-full">
+              <TabsTrigger value="list" className="flex items-center gap-2 w-full">
+                <List className="h-4 w-4" /> List
+              </TabsTrigger>
+              <TabsTrigger value="calendar" className="flex items-center gap-2 w-full">
+                <Calendar className="h-4 w-4" /> Calendar
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
         </div>
 
         {isLoading ? (
           <div className="flex justify-center items-center h-60">
             <Loader2 className="h-10 w-10 animate-spin text-primary opacity-70" />
           </div>
-        ) : events.length > 0 ? (
-          <div className="bg-card/70 backdrop-blur-sm rounded-xl shadow-sm p-6 border">
-            <EventList 
-              events={events} 
-              onEdit={handleEditEvent} 
-              onDelete={handleDeleteEvent} 
-              onToggleStatus={handleToggleStatus} 
-            />
-          </div>
         ) : (
-          <div className="text-center py-20 bg-card/70 backdrop-blur-sm rounded-xl shadow-sm border">
-            <div className="mx-auto w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
-              <Calendar className="h-8 w-8 text-muted-foreground" />
-            </div>
-            <h3 className="text-xl font-medium mb-2">No events yet</h3>
-            <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-              Start planning your schedule by adding your first event.
-            </p>
-            <Button onClick={handleAddEvent}>
-              <Plus className="mr-2 h-4 w-4" /> Create Event
-            </Button>
+          <div className="bg-card/70 backdrop-blur-sm rounded-xl shadow-sm p-6 border">
+            <TabsContent value="list" className="mt-0">
+              <EventList 
+                events={events} 
+                onEdit={handleEditEvent} 
+                onDelete={handleDeleteEvent} 
+                onToggleStatus={handleToggleStatus} 
+              />
+            </TabsContent>
+            
+            <TabsContent value="calendar" className="mt-0">
+              <CalendarView 
+                events={events} 
+                onEventSelect={handleEditEvent} 
+              />
+            </TabsContent>
           </div>
         )}
 
