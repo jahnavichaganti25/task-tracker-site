@@ -17,21 +17,21 @@ const HomeNav = () => {
       description: "Create, update and track your tasks with our intuitive interface. Set priorities, deadlines, and track progress.",
       icon: <CheckSquare className="h-8 w-8" />,
       path: "/tasks",
-      color: "from-blue-500/20 to-indigo-500/20"
+      color: "from-green-500/20 to-emerald-500/20"
     },
     {
       title: "Track Events",
       description: "Schedule and manage your events efficiently. Never miss important appointments or meetings.",
       icon: <Calendar className="h-8 w-8" />,
       path: "/events",
-      color: "from-purple-500/20 to-pink-500/20"
+      color: "from-emerald-500/20 to-teal-500/20"
     },
     {
       title: "View Progress",
       description: "Check your productivity stats and analyze your performance with detailed charts and metrics.",
       icon: <BarChart className="h-8 w-8" />,
       path: "/progress",
-      color: "from-emerald-500/20 to-teal-500/20"
+      color: "from-teal-500/20 to-green-500/20"
     },
   ];
 

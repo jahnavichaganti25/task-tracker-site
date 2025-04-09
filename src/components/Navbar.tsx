@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { 
   Calendar, 
   CheckSquare, 
@@ -33,15 +32,6 @@ const Navbar = () => {
   const handleSignOut = async () => {
     await signOut();
   };
-  
-  const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map(part => part[0])
-      .join('')
-      .toUpperCase()
-      .substring(0, 2);
-  };
 
   const navItems = [
     { path: "/tasks", label: "Tasks", icon: <CheckSquare className="h-4 w-4 mr-2" /> },
@@ -54,7 +44,7 @@ const Navbar = () => {
   return (
     <nav className="py-4 px-6 md:px-10 flex items-center justify-between bg-background border-b sticky top-0 z-10">
       <Link to="/" className="flex items-center gap-2">
-        <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+        <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white">
             <path d="M12 20v-6M6 20V10M18 20V4" />
           </svg>
@@ -84,16 +74,10 @@ const Navbar = () => {
                 ))}
               </NavigationMenuList>
             </NavigationMenu>
-            <div className="flex items-center gap-2">
-              <Avatar className="h-8 w-8">
-                <AvatarImage src={user.user_metadata.avatar_url} alt={user.user_metadata.username || user.email} />
-                <AvatarFallback>{user.user_metadata.username ? getInitials(user.user_metadata.username) : user.email?.charAt(0).toUpperCase()}</AvatarFallback>
-              </Avatar>
-              <Button variant="outline" size="sm" onClick={handleSignOut} className="flex items-center gap-1">
-                <LogOut className="h-4 w-4 mr-1" /> 
-                Sign Out
-              </Button>
-            </div>
+            <Button variant="outline" size="sm" onClick={handleSignOut} className="flex items-center gap-1">
+              <LogOut className="h-4 w-4 mr-1" /> 
+              Sign Out
+            </Button>
           </>
         ) : (
           <Link to="/auth">
@@ -113,7 +97,7 @@ const Navbar = () => {
           <div className="flex flex-col h-full">
             <div className="py-4 border-b">
               <Link to="/" className="flex items-center gap-2 mb-4" onClick={() => setIsOpen(false)}>
-                <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+                <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center">
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white">
                     <path d="M12 20v-6M6 20V10M18 20V4" />
                   </svg>
@@ -121,14 +105,8 @@ const Navbar = () => {
                 <h1 className="text-xl font-semibold">Task Tracker</h1>
               </Link>
               {user && (
-                <div className="flex items-center gap-2">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src={user.user_metadata.avatar_url} alt={user.user_metadata.username || user.email} />
-                    <AvatarFallback>{user.user_metadata.username ? getInitials(user.user_metadata.username) : user.email?.charAt(0).toUpperCase()}</AvatarFallback>
-                  </Avatar>
-                  <span className="text-sm font-medium truncate">
-                    {user.user_metadata.username || user.email}
-                  </span>
+                <div className="text-sm font-medium truncate">
+                  {user.user_metadata.username || user.email}
                 </div>
               )}
             </div>

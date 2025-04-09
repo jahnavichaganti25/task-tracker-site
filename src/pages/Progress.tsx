@@ -120,7 +120,7 @@ const ProgressPage = () => {
                 <div className="space-y-4">
                   <div>
                     <div className="flex items-center justify-between mb-1">
-                      <span className="text-sm font-medium">Events Attended</span>
+                      <span className="text-sm font-medium">Events Attended/Missed</span>
                       <span className="text-sm font-medium">{Math.round(eventStats.attendanceRate)}%</span>
                     </div>
                     <Progress value={eventStats.attendanceRate} className="h-2" />

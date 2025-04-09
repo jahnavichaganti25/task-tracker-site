@@ -58,21 +58,6 @@ const Hero = () => {
             </Button>
           </div>
         )}
-        
-        <div className="mt-20 grid grid-cols-3 gap-8 text-center">
-          <div>
-            <div className="text-3xl font-bold gradient-text">3x</div>
-            <p className="text-muted-foreground mt-1">More Productive</p>
-          </div>
-          <div>
-            <div className="text-3xl font-bold gradient-text">10k+</div>
-            <p className="text-muted-foreground mt-1">Active Users</p>
-          </div>
-          <div>
-            <div className="text-3xl font-bold gradient-text">99%</div>
-            <p className="text-muted-foreground mt-1">Satisfaction</p>
-          </div>
-        </div>
       </div>
     </div>
   );
