@@ -1,10 +1,21 @@
 
-import React from "react";
-import { Navigate, Outlet } from "react-router-dom";
+import React, { useEffect } from "react";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 
 const ProtectedRoute = () => {
   const { user, loading } = useAuth();
+  const location = useLocation();
+
+  useEffect(() => {
+    if (!loading) {
+      console.log("ProtectedRoute: auth status", { 
+        isAuthenticated: !!user,
+        path: location.pathname,
+        loading 
+      });
+    }
+  }, [user, loading, location.pathname]);
 
   if (loading) {
     return (
@@ -15,6 +26,7 @@ const ProtectedRoute = () => {
   }
 
   if (!user) {
+    console.log("User not authenticated, redirecting to /auth");
     return <Navigate to="/auth" replace />;
   }
 

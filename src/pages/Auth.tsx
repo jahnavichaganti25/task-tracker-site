@@ -1,12 +1,15 @@
 
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import { AtSign, AlertCircle } from "lucide-react";
 
 const Auth = () => {
   const [email, setEmail] = useState("");
@@ -14,29 +17,48 @@ const Auth = () => {
   const [username, setUsername] = useState("");
   const [fullName, setFullName] = useState("");
   const [loading, setLoading] = useState(false);
+  const [authError, setAuthError] = useState("");
+  const [activeTab, setActiveTab] = useState("login");
   const navigate = useNavigate();
+  const location = useLocation();
+  const { user } = useAuth();
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (user) {
+      navigate("/");
+    }
+  }, [user, navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setAuthError("");
     
     try {
+      console.log("Attempting to sign in with:", email);
       const { data, error } = await supabase.auth.signInWithPassword({
-        email,
+        email: email.trim(),
         password,
       });
       
-      if (error) throw error;
+      if (error) {
+        console.error("Login error:", error);
+        throw error;
+      }
+
       toast({
         title: "Login successful",
         description: "Welcome back to Task Tracker!",
       });
       navigate("/");
     } catch (error: any) {
+      console.error("Login failed:", error);
+      setAuthError(error.message || "Invalid email or password. Please try again.");
       toast({
         variant: "destructive",
         title: "Login failed",
-        description: error.message || "An error occurred during login",
+        description: error.message || "Invalid email or password. Please try again.",
       });
     } finally {
       setLoading(false);
@@ -46,10 +68,12 @@ const Auth = () => {
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setAuthError("");
     
     try {
+      console.log("Attempting to sign up with:", email);
       const { data, error } = await supabase.auth.signUp({
-        email,
+        email: email.trim(),
         password,
         options: {
           data: {
@@ -59,13 +83,21 @@ const Auth = () => {
         },
       });
       
-      if (error) throw error;
+      if (error) {
+        console.error("Registration error:", error);
+        throw error;
+      }
+
       toast({
         title: "Registration successful",
         description: "Please check your email for verification instructions.",
       });
-      navigate("/");
+      
+      // Switch to login tab after successful registration
+      setActiveTab("login");
     } catch (error: any) {
+      console.error("Registration failed:", error);
+      setAuthError(error.message || "Registration failed. Please try again.");
       toast({
         variant: "destructive",
         title: "Registration failed",
@@ -90,25 +122,37 @@ const Auth = () => {
         </div>
         
         <div className="bg-background p-6 rounded-lg shadow-md border">
-          <Tabs defaultValue="login">
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="grid grid-cols-2 mb-6">
               <TabsTrigger value="login">Login</TabsTrigger>
               <TabsTrigger value="register">Register</TabsTrigger>
             </TabsList>
+            
+            {authError && (
+              <Alert variant="destructive" className="mb-4">
+                <AlertCircle className="h-4 w-4" />
+                <AlertTitle>Authentication Error</AlertTitle>
+                <AlertDescription>{authError}</AlertDescription>
+              </Alert>
+            )}
             
             <TabsContent value="login">
               <form onSubmit={handleLogin}>
                 <div className="space-y-4">
                   <div>
                     <Label htmlFor="email-login">Email</Label>
-                    <Input
-                      id="email-login"
-                      type="email"
-                      placeholder="your@email.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                    />
+                    <div className="relative">
+                      <AtSign className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="email-login"
+                        type="email"
+                        placeholder="your@email.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="pl-10"
+                        required
+                      />
+                    </div>
                   </div>
                   <div>
                     <Label htmlFor="password-login">Password</Label>
@@ -137,14 +181,18 @@ const Auth = () => {
                 <div className="space-y-4">
                   <div>
                     <Label htmlFor="email-signup">Email</Label>
-                    <Input
-                      id="email-signup"
-                      type="email"
-                      placeholder="your@email.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                    />
+                    <div className="relative">
+                      <AtSign className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="email-signup"
+                        type="email"
+                        placeholder="your@email.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="pl-10"
+                        required
+                      />
+                    </div>
                   </div>
                   <div>
                     <Label htmlFor="username">Username</Label>

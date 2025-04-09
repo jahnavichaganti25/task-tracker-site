@@ -18,28 +18,45 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    console.log("AuthProvider mounted, setting up auth");
+    
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
+      (event, currentSession) => {
+        console.log("Auth state changed:", event, currentSession?.user?.email);
+        setSession(currentSession);
+        setUser(currentSession?.user ?? null);
         setLoading(false);
       }
     );
 
     // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
+    supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
+      console.log("Got existing session:", currentSession?.user?.email);
+      setSession(currentSession);
+      setUser(currentSession?.user ?? null);
       setLoading(false);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      console.log("Auth subscription cleanup");
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signOut = async () => {
+    console.log("Signing out");
     await supabase.auth.signOut();
   };
+
+  // For debugging purposes
+  useEffect(() => {
+    console.log("Auth state:", { 
+      isAuthenticated: !!user, 
+      email: user?.email,
+      userId: user?.id 
+    });
+  }, [user]);
 
   return (
     <AuthContext.Provider value={{ session, user, loading, signOut }}>
