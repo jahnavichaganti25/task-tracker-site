@@ -131,12 +131,12 @@ const ProgressPage = () => {
                   
                   <div>
                     <div className="flex items-center justify-between mb-1">
-                      <span className="text-sm font-medium">Events Completed</span>
+                      <span className="text-sm font-medium">Events Missed</span>
                       <span className="text-sm font-medium">{Math.round(eventStats.completionRate)}%</span>
                     </div>
                     <Progress value={eventStats.completionRate} className="h-2" />
                     <p className="mt-2 text-sm text-muted-foreground">
-                      {eventStats.completed} of {eventStats.total} events completed
+                      {eventStats.completed} of {eventStats.total} events missed
                     </p>
                   </div>
                 </div>

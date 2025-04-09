@@ -48,7 +48,7 @@ const EventList = ({ events, onEdit, onDelete, onToggleStatus }: EventListProps)
             <TableHead>Description</TableHead>
             <TableHead>Date & Time</TableHead>
             <TableHead className="w-24 text-center">Attended</TableHead>
-            <TableHead className="w-24 text-center">Completed</TableHead>
+            <TableHead className="w-24 text-center">Missed</TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>

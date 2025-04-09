@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -105,7 +104,7 @@ const Events = () => {
       if (error) throw error;
       
       toast({
-        title: `Event marked as ${field === 'attended' ? (event.attended ? 'not attended' : 'attended') : (event.completed ? 'not completed' : 'completed')}`,
+        title: `Event marked as ${field === 'attended' ? (event.attended ? 'not attended' : 'attended') : (event.completed ? 'not missed' : 'missed')}`,
       });
       
       fetchEvents();
