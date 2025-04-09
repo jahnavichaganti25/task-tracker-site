@@ -179,21 +179,24 @@ const Events = () => {
           </div>
         ) : (
           <div className="bg-card/70 backdrop-blur-sm rounded-xl shadow-sm p-6 border">
-            <TabsContent value="list" className="mt-0">
-              <EventList 
-                events={events} 
-                onEdit={handleEditEvent} 
-                onDelete={handleDeleteEvent} 
-                onToggleStatus={handleToggleStatus} 
-              />
-            </TabsContent>
-            
-            <TabsContent value="calendar" className="mt-0">
-              <CalendarView 
-                events={events} 
-                onEventSelect={handleEditEvent} 
-              />
-            </TabsContent>
+            {/* Wrap the TabsContent components within the Tabs component */}
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <TabsContent value="list" className="mt-0">
+                <EventList 
+                  events={events} 
+                  onEdit={handleEditEvent} 
+                  onDelete={handleDeleteEvent} 
+                  onToggleStatus={handleToggleStatus} 
+                />
+              </TabsContent>
+              
+              <TabsContent value="calendar" className="mt-0">
+                <CalendarView 
+                  events={events} 
+                  onEventSelect={handleEditEvent} 
+                />
+              </TabsContent>
+            </Tabs>
           </div>
         )}
 

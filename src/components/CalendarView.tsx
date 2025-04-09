@@ -94,16 +94,15 @@ const CalendarView: React.FC<CalendarViewProps> = ({ events, onEventSelect }) =>
             modifiers={{
               hasEvents: (date) => hasEvents(date),
             }}
-            // Fix for TS2559: Remove the styles prop and use CSS classes instead
             classNames={{
               day_hasEvents: "event-dot",
             }}
           />
-          <style jsx>{`
-            :global(.event-dot) {
+          <style>{`
+            .event-dot {
               position: relative;
             }
-            :global(.event-dot::after) {
+            .event-dot::after {
               content: "";
               position: absolute;
               width: 6px;
